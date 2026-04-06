@@ -62,7 +62,7 @@
         <span class="ui-label">نظام إدارة المنتجات / المخزون <span class="font-normal text-rose-400">*</span></span>
         <p class="mt-1 text-xs text-zinc-500">اختر خياراً واحداً. حقل اسم النظام أو التفاصيل اختياري حيث يظهر.</p>
     </div>
-    <div class="space-y-3 rounded-xl border border-zinc-700/60 bg-zinc-900/40 p-4">
+    <div class="space-y-3 rounded-xl border border-zinc-700/60 bg-zinc-900/40 p-4" data-inventory-radios>
         <label class="flex cursor-pointer items-start gap-3 text-sm text-zinc-200">
             <input type="radio" name="inventory_system_type" value="erp" class="mt-1 size-4 shrink-0 rounded-full border-zinc-600 bg-zinc-800 text-[#d4ff3f] focus:ring-[#d4ff3f]/30"
                 {{ $invType === 'erp' ? 'checked' : '' }} @if (! isset($agent)) required @endif>
@@ -94,7 +94,7 @@
             <span><span class="font-medium text-zinc-100">٦- أخرى</span><span class="mt-0.5 block text-xs text-zinc-500">اكتب التفاصيل هنا إن رغبت (اختياري).</span></span>
         </label>
     </div>
-    <div data-inventory-note-wrap class="{{ in_array($invType, ['erp', 'cloud', 'accounting', 'other'], true) ? '' : 'hidden' }}">
+    <div data-inventory-note-wrap class="space-y-2" @unless (in_array($invType, ['erp', 'cloud', 'accounting', 'other'], true)) hidden @endunless>
         <label for="inventory_system_note" class="ui-label">اسم النظام أو تفاصيل إضافية <span class="font-normal text-zinc-500">(اختياري)</span></label>
         <input id="inventory_system_note" type="text" name="inventory_system_note" value="{{ $invNote }}" data-inventory-note
             class="ui-input ui-input--muted" placeholder="مثال: اسم البرنامج أو وصف مختصر" maxlength="500" autocomplete="off">
