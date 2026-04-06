@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -71,11 +72,12 @@ class AgentController extends Controller
                 return;
             }
             fprintf($out, '%s', (string) pack('CCC', 0xef, 0xbb, 0xbf));
-            fputcsv($out, ['الاسم', 'الماركات', 'مندوب المبيعات', 'الهاتف', 'الموقع']);
+            fputcsv($out, ['الاسم', 'الماركات', 'نظام المنتجات/المخزون', 'مندوب المبيعات', 'الهاتف', 'الموقع']);
             foreach ($agents as $agent) {
                 fputcsv($out, [
                     $agent->name,
                     $this->brandsCell($agent),
+                    $agent->inventorySystemDisplay(),
                     (string) ($agent->sales_rep_name ?? ''),
                     (string) ($agent->phone ?? ''),
                     (string) ($agent->location ?? ''),
@@ -98,7 +100,7 @@ class AgentController extends Controller
             echo '<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8">';
             echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>';
             echo '<body><table border="1" dir="rtl"><thead><tr>';
-            foreach (['الاسم', 'الماركات', 'مندوب المبيعات', 'الهاتف', 'الموقع'] as $h) {
+            foreach (['الاسم', 'الماركات', 'نظام المنتجات/المخزون', 'مندوب المبيعات', 'الهاتف', 'الموقع'] as $h) {
                 echo '<th>'.$this->escapeSpreadsheetCell($h).'</th>';
             }
             echo '</tr></thead><tbody>';
@@ -107,6 +109,7 @@ class AgentController extends Controller
                 foreach ([
                     $agent->name,
                     $this->brandsCell($agent),
+                    $agent->inventorySystemDisplay(),
                     (string) ($agent->sales_rep_name ?? ''),
                     (string) ($agent->phone ?? ''),
                     (string) ($agent->location ?? ''),
@@ -152,7 +155,7 @@ class AgentController extends Controller
     }
 
     /**
-     * @return array{name: string, brands: array<int, string>|null, sales_rep_name: string|null, phone: string|null, location: string|null}
+     * @return array{name: string, brands: array<int, string>|null, inventory_system_type: string, inventory_system_note: string|null, sales_rep_name: string|null, phone: string|null, location: string|null}
      */
     private function validated(Request $request): array
     {
@@ -160,6 +163,8 @@ class AgentController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'brands' => ['nullable', 'array', 'max:50'],
             'brands.*' => ['nullable', 'string', 'max:255'],
+            'inventory_system_type' => ['required', 'string', Rule::in(array_keys(Agent::inventorySystemTypeLabels()))],
+            'inventory_system_note' => ['nullable', 'string', 'max:500'],
             'sales_rep_name' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],
             'location' => ['nullable', 'string', 'max:2000'],
@@ -172,6 +177,13 @@ class AgentController extends Controller
             }
         }
         $data['brands'] = $brands === [] ? null : $brands;
+
+        if (in_array($data['inventory_system_type'], ['excel', 'none'], true)) {
+            $data['inventory_system_note'] = null;
+        } else {
+            $note = is_string($data['inventory_system_note'] ?? null) ? trim($data['inventory_system_note']) : '';
+            $data['inventory_system_note'] = $note === '' ? null : $note;
+        }
 
         return $data;
     }

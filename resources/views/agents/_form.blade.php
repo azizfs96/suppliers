@@ -52,6 +52,61 @@
         <p class="mt-2 text-sm font-medium text-rose-400">{{ $message }}</p>
     @enderror
 </div>
+
+@php
+    $invType = old('inventory_system_type', isset($agent) ? ($agent->inventory_system_type ?? '') : '');
+    $invNote = old('inventory_system_note', isset($agent) ? (string) ($agent->inventory_system_note ?? '') : '');
+@endphp
+<div class="space-y-3" data-inventory-system>
+    <div>
+        <span class="ui-label">نظام إدارة المنتجات / المخزون <span class="font-normal text-rose-400">*</span></span>
+        <p class="mt-1 text-xs text-zinc-500">اختر خياراً واحداً. حقل اسم النظام أو التفاصيل اختياري حيث يظهر.</p>
+    </div>
+    <div class="space-y-3 rounded-xl border border-zinc-700/60 bg-zinc-900/40 p-4">
+        <label class="flex cursor-pointer items-start gap-3 text-sm text-zinc-200">
+            <input type="radio" name="inventory_system_type" value="erp" class="mt-1 size-4 shrink-0 rounded-full border-zinc-600 bg-zinc-800 text-[#d4ff3f] focus:ring-[#d4ff3f]/30"
+                {{ $invType === 'erp' ? 'checked' : '' }} @if (! isset($agent)) required @endif>
+            <span><span class="font-medium text-zinc-100">١- نظام ERP</span><span class="mt-0.5 block text-xs text-zinc-500">يمكنك كتابة اسم النظام إن وُجد (اختياري).</span></span>
+        </label>
+        <label class="flex cursor-pointer items-start gap-3 text-sm text-zinc-200">
+            <input type="radio" name="inventory_system_type" value="excel" class="mt-1 size-4 shrink-0 rounded-full border-zinc-600 bg-zinc-800 text-[#d4ff3f] focus:ring-[#d4ff3f]/30"
+                {{ $invType === 'excel' ? 'checked' : '' }}>
+            <span class="font-medium text-zinc-100">٢- Excel</span>
+        </label>
+        <label class="flex cursor-pointer items-start gap-3 text-sm text-zinc-200">
+            <input type="radio" name="inventory_system_type" value="cloud" class="mt-1 size-4 shrink-0 rounded-full border-zinc-600 bg-zinc-800 text-[#d4ff3f] focus:ring-[#d4ff3f]/30"
+                {{ $invType === 'cloud' ? 'checked' : '' }}>
+            <span><span class="font-medium text-zinc-100">٣- نظام سحابي للمخزون</span><span class="mt-0.5 block text-xs text-zinc-500">يمكنك كتابة اسم النظام إن وُجد (اختياري).</span></span>
+        </label>
+        <label class="flex cursor-pointer items-start gap-3 text-sm text-zinc-200">
+            <input type="radio" name="inventory_system_type" value="accounting" class="mt-1 size-4 shrink-0 rounded-full border-zinc-600 bg-zinc-800 text-[#d4ff3f] focus:ring-[#d4ff3f]/30"
+                {{ $invType === 'accounting' ? 'checked' : '' }}>
+            <span><span class="font-medium text-zinc-100">٤- نظام محاسبي</span><span class="mt-0.5 block text-xs text-zinc-500">يمكنك كتابة اسم النظام إن وُجد (اختياري).</span></span>
+        </label>
+        <label class="flex cursor-pointer items-start gap-3 text-sm text-zinc-200">
+            <input type="radio" name="inventory_system_type" value="none" class="mt-1 size-4 shrink-0 rounded-full border-zinc-600 bg-zinc-800 text-[#d4ff3f] focus:ring-[#d4ff3f]/30"
+                {{ $invType === 'none' ? 'checked' : '' }}>
+            <span class="font-medium text-zinc-100">٥- لا يوجد نظام</span>
+        </label>
+        <label class="flex cursor-pointer items-start gap-3 text-sm text-zinc-200">
+            <input type="radio" name="inventory_system_type" value="other" class="mt-1 size-4 shrink-0 rounded-full border-zinc-600 bg-zinc-800 text-[#d4ff3f] focus:ring-[#d4ff3f]/30"
+                {{ $invType === 'other' ? 'checked' : '' }}>
+            <span><span class="font-medium text-zinc-100">٦- أخرى</span><span class="mt-0.5 block text-xs text-zinc-500">اكتب التفاصيل هنا إن رغبت (اختياري).</span></span>
+        </label>
+    </div>
+    <div data-inventory-note-wrap class="{{ in_array($invType, ['erp', 'cloud', 'accounting', 'other'], true) ? '' : 'hidden' }}">
+        <label for="inventory_system_note" class="ui-label">اسم النظام أو تفاصيل إضافية <span class="font-normal text-zinc-500">(اختياري)</span></label>
+        <input id="inventory_system_note" type="text" name="inventory_system_note" value="{{ $invNote }}" data-inventory-note
+            class="ui-input ui-input--muted" placeholder="مثال: اسم البرنامج أو وصف مختصر" maxlength="500" autocomplete="off">
+        @error('inventory_system_note')
+            <p class="mt-2 text-sm font-medium text-rose-400">{{ $message }}</p>
+        @enderror
+    </div>
+    @error('inventory_system_type')
+        <p class="text-sm font-medium text-rose-400">{{ $message }}</p>
+    @enderror
+</div>
+
 <div>
     <label for="sales_rep_name" class="ui-label">اسم مندوب المبيعات</label>
     <input id="sales_rep_name" name="sales_rep_name" type="text" value="{{ old('sales_rep_name', isset($agent) ? $agent->sales_rep_name : '') }}"

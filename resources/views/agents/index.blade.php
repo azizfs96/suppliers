@@ -78,6 +78,11 @@
                                     </div>
                                 @endif
 
+                                <div class="ui-agent-card__block">
+                                    <p class="ui-agent-card__label">نظام المنتجات / المخزون</p>
+                                    <p class="ui-agent-card__meta text-zinc-300">{{ $agent->inventorySystemDisplay() }}</p>
+                                </div>
+
                                 @if ($agent->sales_rep_name)
                                     <p class="ui-agent-card__meta">
                                         <strong>مندوب المبيعات</strong>
